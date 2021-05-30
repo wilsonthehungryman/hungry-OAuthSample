@@ -8,7 +8,7 @@ import org.koin.dsl.module
 
 
 val userKoinModule = module(createdAtStart = true) {
-    single { SqlUserRepository(get()) as UserRepository }
+    single { SqlUserRepository() as UserRepository }
     single { PasswordService() }
     single { OAuthService(get(), get()) }
     single { OAuthApi(get()) }

@@ -13,6 +13,7 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.jackson.jackson
 import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
+import org.jetbrains.exposed.sql.Database
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
@@ -35,9 +36,11 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
-    appConfig.sqlConfig.connect()
+    val db = appConfig.sqlConfig.dataSource
+    Database.connect(db)
     install(FlywayFeature) {
-        dataSource = appConfig.sqlConfig.dataSource
+        dataSource = db
+        schemas = arrayOf("users")
     }
 
     install(Koin) {
