@@ -2,7 +2,7 @@ package com.hungry.oauthsample.domain
 
 import java.util.UUID
 
-class passwordService {
+class PasswordService {
     val pepper = "replace me"
 
     fun hashPassword(password: String): Pair<String, String> {
