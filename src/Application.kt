@@ -38,10 +38,11 @@ fun Application.module(testing: Boolean = false) {
 
     val db = appConfig.sqlConfig.dataSource
     Database.connect(db)
-    install(FlywayFeature) {
-        dataSource = db
-        schemas = arrayOf("users")
-    }
+    // Actually, might be fine without
+//    install(FlywayFeature) {
+//        dataSource = db
+//        schemas = arrayOf("users")
+//    }
 
     install(Koin) {
         val appConfigModule = bindAppConfig(appConfig)
