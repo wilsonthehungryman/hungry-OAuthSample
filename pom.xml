@@ -104,6 +104,11 @@
             <version>0.31.1</version>
         </dependency>
         <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-server-tests</artifactId>
             <version>${ktor_version}</version>
