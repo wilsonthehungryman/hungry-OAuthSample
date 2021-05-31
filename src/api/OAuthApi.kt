@@ -2,6 +2,7 @@ package com.hungry.oauthsample.api
 
 import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
 import com.hungry.oauthsample.domain.OAuthService
+import java.util.UUID
 
 class OAuthApi(
     private val service: OAuthService,

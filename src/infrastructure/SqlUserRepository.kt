@@ -1,6 +1,6 @@
 package com.hungry.oauthsample.infrastructure
 
-import com.hungry.oauthsample.com.hungry.oauthsample.domain.CreateUser.kt.CreateUser
+import com.hungry.oauthsample.domain.User
 import com.hungry.oauthsample.domain.UserRepository
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Column
@@ -14,7 +14,7 @@ internal object User: LongIdTable() {
 }
 
 class SqlUserRepository: UserRepository {
-    override fun save(user: CreateUser, hashedPassword: String, salt: String) {
+    override fun saveUser(user: User, hashedPassword: String, salt: String) {
         TODO("Not yet implemented")
     }
 
