@@ -5,7 +5,7 @@ class OAuthService(
     private val passwordService: PasswordService,
 ) {
     fun createUser(createUser: CreateUser) {
-        val (hashedPassword, salt) = passwordService.hashPassword(createUser.password)
-        userRepository.saveUser(createUser.toUser(), hashedPassword, salt)
+        val hashedPassword = passwordService.hashPassword(createUser.password)
+        userRepository.saveUser(createUser.toUser(), hashedPassword)
     }
 }

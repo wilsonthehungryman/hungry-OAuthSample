@@ -19,7 +19,6 @@ internal object UserTable: LongIdTable() {
 internal object CredentialTable: Table() {
     val userId: Column<String> = varchar("user_id", 200).uniqueIndex()
     val hashedPassword: Column<String> = varchar("hashed_password", 200)
-    val salt: Column<String> = varchar("salt", 200)
 }
 
 class SqlUserRepository: UserRepository {
@@ -30,12 +29,11 @@ class SqlUserRepository: UserRepository {
         }
     }
 
-    override fun saveUser(user: User, hashedPassword: String, salt: String) {
+    override fun saveUser(user: User, hashedPassword: String) {
         transaction {
             CredentialTable.insert {
                 it[userId] = user.id
                 it[CredentialTable.hashedPassword] = hashedPassword
-                it[CredentialTable.salt] = salt
             }
 
             UserTable.insert {
