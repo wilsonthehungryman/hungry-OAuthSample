@@ -17,11 +17,11 @@ class TokenService {
         builder.signWith(signatureAlgorithm, signingKey)
     }
 
-    fun createAccessToken(user: User, now: Instant, audience: String): String {
+    fun createAccessToken(userId: String, now: Instant, audience: String): String {
         val builder = AccessToken(
             issuer,
             audience,
-            user.id,
+            userId,
         ).toJwtBuilder(now)
 
         builder.signWith(SignatureAlgorithm.HS256, signingKey)
@@ -30,7 +30,17 @@ class TokenService {
         return builder.compact()
     }
 
-    fun createRefreshToken(accessToken: AccessToken) {
+    fun createRefreshToken(userId: String, now: Instant, audience: String, tokenId: String): String {
+        val builder = RefreshToken(
+            issuer,
+            audience,
+            userId,
+            tokenId
+        ).toJwtBuilder(now)
+        
+        builder.signWith(SignatureAlgorithm.HS256, signingKey)
+        sign(builder)
 
+        return builder.compact()
     }
 }
