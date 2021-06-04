@@ -23,10 +23,7 @@ class TokenService {
             userId,
         ).toJwtBuilder(now)
 
-        builder.signWith(SignatureAlgorithm.HS256, signingKey)
-        sign(builder)
-
-        return builder.compact()
+        return signBuilder(builder)
     }
 
     fun createRefreshToken(userId: String, now: Instant, audience: String, tokenId: String): String {
@@ -37,10 +34,7 @@ class TokenService {
             tokenId
         ).toJwtBuilder(now)
 
-        builder.signWith(SignatureAlgorithm.HS256, signingKey)
-        sign(builder)
-
-        return builder.compact()
+        return signBuilder(builder)
     }
 
     fun createIdToken(userId: String, now: Instant, audience: String, claims: Map<String, Any>): String {
@@ -51,6 +45,10 @@ class TokenService {
             claims,
         ).toJwtBuilder(now)
 
+        return signBuilder(builder)
+    }
+
+    private fun signBuilder(builder: JwtBuilder): String {
         builder.signWith(SignatureAlgorithm.HS256, signingKey)
         sign(builder)
 
