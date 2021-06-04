@@ -43,6 +43,20 @@ class TokenService {
         return builder.compact()
     }
 
+    fun createIdToken(userId: String, now: Instant, audience: String, claims: Map<String, Any>): String {
+        val builder = IdToken(
+            issuer,
+            audience,
+            userId,
+            claims,
+        ).toJwtBuilder(now)
+
+        builder.signWith(SignatureAlgorithm.HS256, signingKey)
+        sign(builder)
+
+        return builder.compact()
+    }
+
     // TODO, need to unit test this and/or check lib, does it validate expiration?
     fun validateToken(token: String): GenericToken {
         return GenericToken(Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token))
