@@ -1,12 +1,11 @@
 package com.hungry.oauthsample.domain.tokens
 
-import com.hungry.oauthsample.domain.User
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jws
 import io.jsonwebtoken.JwtBuilder
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import java.time.Instant
-import java.util.Date
-import java.util.UUID
 
 class TokenService {
     val issuer = "hungry"
@@ -37,10 +36,15 @@ class TokenService {
             userId,
             tokenId
         ).toJwtBuilder(now)
-        
+
         builder.signWith(SignatureAlgorithm.HS256, signingKey)
         sign(builder)
 
         return builder.compact()
+    }
+
+    // TODO, need to unit test this and/or check lib, does it validate expiration?
+    fun validateToken(token: String): GenericToken {
+        return GenericToken(Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token))
     }
 }
