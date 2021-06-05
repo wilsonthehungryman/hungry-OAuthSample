@@ -20,6 +20,7 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
     }
 
     route("/client") {
+        // TODO should be more along the lines of, create user, register client to user, client created, only created user can manage
         get {
             call.respond(HttpStatusCode.Created, oAuthApi.createClient())
         }
