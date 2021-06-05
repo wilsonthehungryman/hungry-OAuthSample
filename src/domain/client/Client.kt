@@ -5,6 +5,7 @@ import java.util.UUID
 class Client (
     val id: String,
     val secretKey: String,
+    val redirectUris: Set<String> = emptySet()
         ) {
     companion object {
         fun generate(): Client {

@@ -18,4 +18,14 @@ class OAuthService(
         clientRepository.save(client)
         return client
     }
+
+    fun updateRedirects(client: Client) {
+        val foundClient = clientRepository.findById(client.id) ?: throw Forbidden()
+
+        if (client.secretKey == foundClient.secretKey) {
+            clientRepository.updateRedirects(client)
+        } else {
+            throw Forbidden()
+        }
+    }
 }
