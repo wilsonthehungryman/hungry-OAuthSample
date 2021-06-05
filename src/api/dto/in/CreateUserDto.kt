@@ -1,6 +1,6 @@
 package com.hungry.oauthsample.api.dto.`in`
 
-import com.hungry.oauthsample.domain.CreateUser
+import com.hungry.oauthsample.domain.users.CreateUser
 
 
 data class CreateUserDto(

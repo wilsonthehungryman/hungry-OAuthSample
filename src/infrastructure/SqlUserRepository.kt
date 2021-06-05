@@ -1,7 +1,7 @@
 package com.hungry.oauthsample.infrastructure
 
-import com.hungry.oauthsample.domain.User
-import com.hungry.oauthsample.domain.UserRepository
+import com.hungry.oauthsample.domain.users.User
+import com.hungry.oauthsample.domain.users.UserRepository
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils

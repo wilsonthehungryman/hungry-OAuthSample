@@ -1,4 +1,4 @@
-package com.hungry.oauthsample.domain
+package com.hungry.oauthsample.domain.users
 
 import java.util.UUID
 
