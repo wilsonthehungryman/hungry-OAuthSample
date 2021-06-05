@@ -1,21 +1,24 @@
 package com.hungry.oauthsample.infrastructure
 
+import com.hungry.oauthsample.domain.oauth.Credential
 import com.hungry.oauthsample.domain.users.User
 import com.hungry.oauthsample.domain.users.UserRepository
-import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
-internal object UserTable: LongIdTable() {
+internal object UserTable: UUIDTable() {
     val email: Column<String> = varchar("email", 200).uniqueIndex()
     val phoneNumber: Column<String> = varchar("phone_number", 100)
     val name: Column<String?> = varchar("name", 200).nullable()
     val age: Column<Int?> = integer("age").nullable()
 }
 
+// TODO think this needs a refactor, being it's own domain entity
 internal object CredentialTable: Table() {
     val userId: Column<String> = varchar("user_id", 200).uniqueIndex()
     val hashedPassword: Column<String> = varchar("hashed_password", 200)
@@ -43,5 +46,30 @@ class SqlUserRepository: UserRepository {
                 it[age] = user.age
             }
         }
+    }
+
+    override fun findByEmail(email: String): User? {
+        return (UserTable).select {
+            UserTable.email eq email
+        }.map {
+            User(
+                it[UserTable.id].toString(),
+                it[UserTable.email],
+                it[UserTable.phoneNumber],
+                it[UserTable.name],
+                it[UserTable.age],
+            )
+        }.singleOrNull()
+    }
+
+    override fun findCredentialById(userId: String): Credential? {
+        return CredentialTable.select {
+            CredentialTable.userId eq userId
+        }.map {
+            Credential(
+                it[CredentialTable.userId],
+                it[CredentialTable.hashedPassword],
+            )
+        }.singleOrNull()
     }
 }

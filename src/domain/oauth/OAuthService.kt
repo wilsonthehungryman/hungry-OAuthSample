@@ -2,9 +2,11 @@ package com.hungry.oauthsample.domain.oauth
 
 import com.hungry.oauthsample.domain.users.CreateUser
 import com.hungry.oauthsample.domain.Forbidden
+import com.hungry.oauthsample.domain.Unauthorized
 import com.hungry.oauthsample.domain.users.UserRepository
 import com.hungry.oauthsample.domain.client.Client
 import com.hungry.oauthsample.domain.client.ClientRepository
+import java.util.UUID
 
 class OAuthService(
     private val passwordService: PasswordService,
@@ -32,7 +34,23 @@ class OAuthService(
         }
     }
 
-    fun authenticateCode(authentication: Authentication): Any {
-        TODO("Not yet implemented")
+    fun authenticateCode(authentication: Authentication): Pair<String, String> {
+        val client = clientRepository.findById(authentication.clientId) ?: throw Unauthorized()
+
+        if (!client.redirectUris.contains(authentication.redirectUri))
+            throw Unauthorized()
+
+        val user = userRepository.findByEmail(authentication.email) ?: throw Unauthorized()
+        val credential = userRepository.findCredentialById(user.id) ?: throw Unauthorized()
+
+        if (!passwordService.isMatchingPassword(authentication.password, credential.hashedPassword))
+            throw Unauthorized()
+
+        // TODO should be more complex
+        val code = UUID.randomUUID().toString()
+
+        // TODO save code with time
+
+        return Pair(code, authentication.redirectUri)
     }
 }
