@@ -146,6 +146,10 @@
                         <id>compile</id>
                         <goals><goal>compile</goal></goals>
                         <configuration>
+                            <args>
+                                <arg>-Xopt-in=kotlin.RequiresOptIn</arg>
+                                <arg>-Xopt-in=kotlin.OptIn</arg>
+                            </args>
                             <experimentalCoroutines>enable</experimentalCoroutines>
                         </configuration>
                     </execution>

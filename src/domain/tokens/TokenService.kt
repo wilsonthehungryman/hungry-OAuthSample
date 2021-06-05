@@ -9,7 +9,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
-@ExperimentalTime
+@OptIn(ExperimentalTime::class)
 class TokenService(
     private val tokenRepository: TokenRepository
 ) {
