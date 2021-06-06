@@ -1,4 +1,4 @@
-package com.hungry.oauthsample.infrastructure
+package com.hungry.oauthsample.infrastructure.sql
 
 import com.hungry.oauthsample.domain.client.Client
 import com.hungry.oauthsample.domain.client.ClientRepository
