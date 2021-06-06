@@ -3,6 +3,7 @@ package com.hungry.oauthsample.infrastructure
 import com.hungry.oauthsample.api.OAuthApi
 import com.hungry.oauthsample.api.dto.ClientDto
 import com.hungry.oauthsample.api.dto.`in`.AuthenticationDto
+import com.hungry.oauthsample.api.dto.`in`.CodeExchangeDto
 import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -21,6 +22,10 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
         post ("/authentication") {
             val codeRedirect = oAuthApi.authenticate(call.receive<AuthenticationDto>())
             call.respondRedirect(codeRedirect.toUrl().buildString(), false)
+        }
+
+        post ("/exchange/code") {
+            call.respond(HttpStatusCode.OK, oAuthApi.exchangeCode(call.receive<CodeExchangeDto>))
         }
     }
 

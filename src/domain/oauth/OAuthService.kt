@@ -52,4 +52,8 @@ class OAuthService(
 
         return CodeRedirect(code.code, authentication.state, authentication.redirectUri)
     }
+
+    fun exchangeCode(code: String, client: Client) {
+        TODO("Not yet implemented")
+    }
 }
