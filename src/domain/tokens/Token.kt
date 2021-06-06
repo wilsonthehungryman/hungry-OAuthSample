@@ -1,12 +1,34 @@
 package com.hungry.oauthsample.domain.tokens
 
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
-import io.jsonwebtoken.JwtBuilder
-import io.jsonwebtoken.Jwts
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTCreator.Builder
+import com.auth0.jwt.interfaces.DecodedJWT
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
+
+fun Builder.withClaim(name: String, value: Instant): Builder {
+    this.withClaim(name, Date.from(value))
+    return this
+}
+
+fun Builder.withClaims(claims: Map<String, Any>): Builder {
+    claims.entries.forEach {
+        when (val value = it.value) {
+            is String -> this.withClaim(it.key, value)
+            is Boolean -> this.withClaim(it.key, value)
+            is Instant -> this.withClaim(it.key, value)
+            is Date -> this.withClaim(it.key, value)
+            is Int -> this.withClaim(it.key, value)
+            is Double -> this.withClaim(it.key, value)
+            is Long -> this.withClaim(it.key, value)
+            is List<*> -> this.withClaim(it.key, value)
+            // TODO arrays and map, not needed for my use case
+//            is Map<*, *> -> this.withClaim(it.key, value as Map<String, *>)
+        }
+    }
+    return this
+}
 
 class Token (
     val issuer: String,
@@ -17,29 +39,29 @@ class Token (
     val id: String = UUID.randomUUID().toString(),
     val claims: Map<String, Any> = emptyMap(),
 ) {
-    constructor(claims: Jws<Claims>) : this(
-        claims.body.issuer,
-        claims.body.audience,
-        claims.body.subject,
-        claims.body.issuedAt.toInstant(),
-        claims.body.expiration.toInstant(),
-        claims.body.id,
-        claims.body.toMap(),
+    constructor(jwt: DecodedJWT) : this(
+        jwt.issuer,
+        jwt.audience.first(),
+        jwt.subject,
+        jwt.issuedAt.toInstant(),
+        jwt.expiresAt.toInstant(),
+        jwt.id,
+        jwt.claims,
     )
 
     fun isExpired(now: Instant): Boolean {
         return expiresAt < now
     }
 
-    fun toJwtBuilder(): JwtBuilder {
-        return Jwts.builder()
-            .setId(id)
-            .setIssuedAt(Date.from(issuedAt))
-            .setIssuer(issuer)
-            .setSubject(subject)
-            .setAudience(audience)
-            .setExpiration(Date.from(expiresAt))
-            .setNotBefore(Date.from(issuedAt))
-            .addClaims(claims)
+    fun toJwtBuilder(): Builder {
+        return JWT.create()
+            .withJWTId(id)
+            .withIssuedAt(Date.from(issuedAt))
+            .withIssuer(issuer)
+            .withSubject(subject)
+            .withAudience(audience)
+            .withExpiresAt(Date.from(expiresAt))
+            .withNotBefore(Date.from(issuedAt))
+            .withClaims(claims)
     }
 }

@@ -8,6 +8,7 @@ import com.hungry.oauthsample.domain.client.ClientRepository
 import com.hungry.oauthsample.domain.oauth.CodeRepository
 import com.hungry.oauthsample.domain.tokens.TokenRepository
 import com.hungry.oauthsample.domain.tokens.TokenService
+import com.hungry.oauthsample.infrastructure.config.AppConfig
 import com.hungry.oauthsample.infrastructure.sql.SqlClientRepository
 import com.hungry.oauthsample.infrastructure.sql.SqlCodeRepository
 import com.hungry.oauthsample.infrastructure.sql.SqlTokenRepository
@@ -22,7 +23,7 @@ val userKoinModule = module(createdAtStart = true) {
     single { SqlCodeRepository() as CodeRepository }
     
     single { PasswordService() }
-    single { TokenService(get()) }
+    single { TokenService(get(), get<AppConfig>().keysConfig) }
     single { OAuthService(get(), get(), get(), get(), get()) }
 
     single { OAuthApi(get()) }
