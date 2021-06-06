@@ -29,46 +29,58 @@ class SqlTokenRepository: TokenRepository {
     }
 
     override fun save(token: Token) {
-        TokenTable.insert {
-            it[id] = UUID.fromString(token.id)
-            it[audience] = token.audience
-            it[subject] = token.subject
-            it[issuedAt] = token.issuedAt.toEpochMilli()
-            it[expiresAt] = token.expiresAt.toEpochMilli()
+        transaction {
+            TokenTable.insert {
+                it[id] = UUID.fromString(token.id)
+                it[audience] = token.audience
+                it[subject] = token.subject
+                it[issuedAt] = token.issuedAt.toEpochMilli()
+                it[expiresAt] = token.expiresAt.toEpochMilli()
+            }
         }
     }
 
     override fun findById(id: String): Token? {
-        return TokenTable.select {
-            TokenTable.id eq UUID.fromString(id)
-        }.map {
-            deserialize(it)
-        }.singleOrNull()
+        return transaction {
+            TokenTable.select {
+                TokenTable.id eq UUID.fromString(id)
+            }.map {
+                deserialize(it)
+            }.singleOrNull()
+        }
     }
 
     override fun findByUserId(userId: String): Set<Token> {
-        return TokenTable.select {
-            TokenTable.subject eq userId
-        }.map {
-            deserialize(it)
-        }.toSet()
+        return transaction {
+            TokenTable.select {
+                TokenTable.subject eq userId
+            }.map {
+                deserialize(it)
+            }.toSet()
+        }
     }
 
     override fun deleteById(id: String) {
-        TokenTable.deleteWhere {
-            TokenTable.id eq UUID.fromString(id)
+        transaction {
+            TokenTable.deleteWhere {
+                TokenTable.id eq UUID.fromString(id)
+            }
         }
     }
 
     override fun deleteByUserId(userId: String) {
-        TokenTable.deleteWhere {
-            TokenTable.subject eq userId
+        transaction {
+            TokenTable.deleteWhere {
+                TokenTable.subject eq userId
+            }
         }
     }
 
     override fun deleteExpiredTokens(now: Instant) {
-        TokenTable.deleteWhere {
-            TokenTable.expiresAt less now.toEpochMilli()
+        transaction {
+            TokenTable.deleteWhere {
+                TokenTable.expiresAt less now.toEpochMilli()
+            }
         }
     }
 

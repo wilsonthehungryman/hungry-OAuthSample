@@ -25,34 +25,42 @@ class SqlCodeRepository: CodeRepository {
     }
 
     override fun save(code: Code) {
-        CodeTable.insert {
-            it[CodeTable.code] = code.code
-            it[clientId] = code.clientId
-            it[expiresAt] = code.expiresAt.toEpochMilli()
+        transaction {
+            CodeTable.insert {
+                it[CodeTable.code] = code.code
+                it[clientId] = code.clientId
+                it[expiresAt] = code.expiresAt.toEpochMilli()
+            }
         }
     }
 
     override fun findByCode(code: String): Code? {
-        return CodeTable.select {
-            CodeTable.code eq code
-        }.map {
-            Code(
-                it[CodeTable.code],
-                it[CodeTable.clientId],
-                Instant.ofEpochMilli(it[CodeTable.expiresAt]),
-            )
-        }.singleOrNull()
+        return transaction {
+            CodeTable.select {
+                CodeTable.code eq code
+            }.map {
+                Code(
+                    it[CodeTable.code],
+                    it[CodeTable.clientId],
+                    Instant.ofEpochMilli(it[CodeTable.expiresAt]),
+                )
+            }.singleOrNull()
+        }
     }
 
     override fun deleteCode(code: String) {
-        CodeTable.deleteWhere {
-            CodeTable.code eq code
+        transaction {
+            CodeTable.deleteWhere {
+                CodeTable.code eq code
+            }
         }
     }
 
     override fun deleteExpiredCodes(now: Instant) {
-        CodeTable.deleteWhere {
-            CodeTable.expiresAt lessEq now.toEpochMilli()
+        transaction {
+            CodeTable.deleteWhere {
+                CodeTable.expiresAt lessEq now.toEpochMilli()
+            }
         }
     }
 }

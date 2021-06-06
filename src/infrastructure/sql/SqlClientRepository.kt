@@ -31,31 +31,37 @@ class SqlClientRepository: ClientRepository {
     }
 
     override fun save(client: Client) {
-        ClientTable.insert {
-            it[id] = UUID.fromString(client.id)
-            it[secretKey] = client.secretKey
-        }
+        transaction {
+            ClientTable.insert {
+                it[id] = UUID.fromString(client.id)
+                it[secretKey] = client.secretKey
+            }
 
-        saveRedirects(client)
+            saveRedirects(client)
+        }
     }
 
     override fun findById(id: String): Client? {
-        return ClientTable.select {
-            ClientTable.id eq UUID.fromString(id)
-        }.map {
-            Client(
-                it[ClientTable.id].toString(),
-                it[ClientTable.secretKey],
-            )
-        }.singleOrNull()
+        return transaction {
+            ClientTable.select {
+                ClientTable.id eq UUID.fromString(id)
+            }.map {
+                Client(
+                    it[ClientTable.id].toString(),
+                    it[ClientTable.secretKey],
+                )
+            }.singleOrNull()
+        }
     }
 
     override fun updateRedirects(client: Client) {
-        RedirectsTable.deleteWhere {
-            RedirectsTable.clientId eq client.id
-        }
+        transaction {
+            RedirectsTable.deleteWhere {
+                RedirectsTable.clientId eq client.id
+            }
 
-        saveRedirects(client)
+            saveRedirects(client)
+        }
     }
 
     private fun saveRedirects(client: Client) {
