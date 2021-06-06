@@ -49,27 +49,31 @@ class SqlUserRepository: UserRepository {
     }
 
     override fun findByEmail(email: String): User? {
-        return (UserTable).select {
-            UserTable.email eq email
-        }.map {
-            User(
-                it[UserTable.id].toString(),
-                it[UserTable.email],
-                it[UserTable.phoneNumber],
-                it[UserTable.name],
-                it[UserTable.age],
-            )
-        }.singleOrNull()
+        return transaction {
+            UserTable.select {
+                UserTable.email eq email
+            }.map {
+                User(
+                    it[UserTable.id].toString(),
+                    it[UserTable.email],
+                    it[UserTable.phoneNumber],
+                    it[UserTable.name],
+                    it[UserTable.age],
+                )
+            }.singleOrNull()
+        }
     }
 
     override fun findCredentialById(userId: String): Credential? {
-        return CredentialTable.select {
-            CredentialTable.userId eq userId
-        }.map {
-            Credential(
-                it[CredentialTable.userId],
-                it[CredentialTable.hashedPassword],
-            )
-        }.singleOrNull()
+        return transaction {
+            CredentialTable.select {
+                CredentialTable.userId eq userId
+            }.map {
+                Credential(
+                    it[CredentialTable.userId],
+                    it[CredentialTable.hashedPassword],
+                )
+            }.singleOrNull()
+        }
     }
 }

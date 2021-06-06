@@ -49,6 +49,7 @@ class SqlClientRepository: ClientRepository {
                 Client(
                     it[ClientTable.id].toString(),
                     it[ClientTable.secretKey],
+                    findRedirects(id)
                 )
             }.singleOrNull()
         }
@@ -62,6 +63,14 @@ class SqlClientRepository: ClientRepository {
 
             saveRedirects(client)
         }
+    }
+
+    private fun findRedirects(clientId: String): Set<String> {
+        return RedirectsTable.select {
+            RedirectsTable.clientId eq clientId
+        }.map {
+            it[RedirectsTable.redirectUri]
+        }.toSet()
     }
 
     private fun saveRedirects(client: Client) {

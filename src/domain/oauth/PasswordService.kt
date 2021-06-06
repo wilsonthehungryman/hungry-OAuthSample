@@ -4,20 +4,25 @@ import org.mindrot.jbcrypt.BCrypt
 
 class PasswordService {
     // TODO shouldn't be hardcoded, and should be secret and unique per env
-    private val pepper = "36f61d32-6c9c-4641-9f32-9a3fce8f1b8f"
+    // just a result from gensalt(), is a secret salt after all
+    companion object {
+        private const val pepper = "\$2a\$10\$faYzNGod4.Hk/iXFtFJufu"
+    }
 
     fun hashPassword(password: String): String {
-        val passwordWithPepper = BCrypt.hashpw(password, pepper)
-        return BCrypt.hashpw(passwordWithPepper, BCrypt.gensalt())
+        return BCrypt.hashpw(addPepper(password), BCrypt.gensalt())
     }
 
     fun isMatchingPassword(password: String, hashedPassword: String): Boolean {
-        val passwordWithPepper = BCrypt.hashpw(password, pepper)
-        return BCrypt.checkpw(passwordWithPepper, hashedPassword)
+        return BCrypt.checkpw(addPepper(password), hashedPassword)
     }
 
     fun isPreviouslyUsed(password: String, hashedPasswords: Set<String>): Boolean {
-        val passwordWithPepper = BCrypt.hashpw(password, pepper)
+        val passwordWithPepper = addPepper(password)
         return hashedPasswords.stream().anyMatch { BCrypt.checkpw(passwordWithPepper, it) }
+    }
+
+    private fun addPepper(password: String): String {
+        return BCrypt.hashpw(password, pepper)
     }
 }
