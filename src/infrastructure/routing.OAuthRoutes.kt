@@ -25,7 +25,7 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
         }
 
         post ("/exchange/code") {
-            call.respond(HttpStatusCode.OK, oAuthApi.exchangeCode(call.receive<CodeExchangeDto>))
+            call.respond(HttpStatusCode.OK, oAuthApi.exchangeCode(call.receive<CodeExchangeDto>()))
         }
     }
 

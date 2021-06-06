@@ -23,7 +23,7 @@ val userKoinModule = module(createdAtStart = true) {
     
     single { PasswordService() }
     single { TokenService(get()) }
-    single { OAuthService(get(), get(), get(), get()) }
+    single { OAuthService(get(), get(), get(), get(), get()) }
 
     single { OAuthApi(get()) }
 }

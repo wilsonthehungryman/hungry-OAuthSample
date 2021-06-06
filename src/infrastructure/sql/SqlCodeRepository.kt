@@ -14,6 +14,7 @@ import java.time.Instant
 internal object CodeTable: UUIDTable("codes") {
     val code: Column<String> = varchar("code", 500).uniqueIndex()
     val clientId: Column<String> = varchar("client_id", 250)
+    val userId: Column<String> = varchar("user_id", 250)
     val expiresAt: Column<Long> = long("expires_at")
 }
 
@@ -29,6 +30,7 @@ class SqlCodeRepository: CodeRepository {
             CodeTable.insert {
                 it[CodeTable.code] = code.code
                 it[clientId] = code.clientId
+                it[userId] = code.userId
                 it[expiresAt] = code.expiresAt.toEpochMilli()
             }
         }
@@ -42,6 +44,7 @@ class SqlCodeRepository: CodeRepository {
                 Code(
                     it[CodeTable.code],
                     it[CodeTable.clientId],
+                    it[CodeTable.userId],
                     Instant.ofEpochMilli(it[CodeTable.expiresAt]),
                 )
             }.singleOrNull()

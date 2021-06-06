@@ -30,6 +30,6 @@ class OAuthApi(
 
     fun exchangeCode(codeExchangeDto: CodeExchangeDto): UserTokensDto {
         val client = Client(codeExchangeDto.clientId, codeExchangeDto.clientSecret)
-        service.exchangeCode(codeExchangeDto.code, client)
+        return UserTokensDto.fromDomain(service.exchangeCode(codeExchangeDto.code, client))
     }
 }

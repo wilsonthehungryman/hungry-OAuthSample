@@ -40,14 +40,13 @@ class TokenService(
         return signToken(token.toJwtBuilder())
     }
 
-    fun createRefreshToken(userId: String, now: Instant, audience: String, tokenId: String): String {
+    fun createRefreshToken(userId: String, now: Instant, audience: String): String {
         val token = Token(
             ISSUER,
             audience,
             userId,
             now,
             now.plusSeconds(REFRESH_TOKEN_EXPIRY_SECONDS),
-            tokenId,
         )
 
         return signToken(token.toJwtBuilder())
