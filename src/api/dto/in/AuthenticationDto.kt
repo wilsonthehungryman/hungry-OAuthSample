@@ -7,6 +7,7 @@ data class AuthenticationDto(
     val password: String,
     val clientId: String,
     val redirectUri: String,
+    val state: String?,
     val scope: String? // TODO, though not really needed atm, just for openid
 ) {
     fun toDomain(): Authentication {
@@ -15,7 +16,8 @@ data class AuthenticationDto(
             password,
             clientId,
             redirectUri,
-            scope
+            state,
+            scope,
         )
     }
 }

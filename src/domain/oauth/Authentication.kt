@@ -5,6 +5,7 @@ class Authentication(
     val password: String,
     val clientId: String,
     val redirectUri: String,
-    val scope: String?
+    val state: String?,
+    val scope: String?,
 ) {
 }

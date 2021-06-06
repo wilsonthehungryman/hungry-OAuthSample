@@ -34,7 +34,7 @@ class OAuthService(
         }
     }
 
-    fun authenticateCode(authentication: Authentication): Pair<String, String> {
+    fun authenticateCode(authentication: Authentication): CodeRedirect {
         val client = clientRepository.findById(authentication.clientId) ?: throw Unauthorized()
 
         if (!client.redirectUris.contains(authentication.redirectUri))
@@ -50,6 +50,6 @@ class OAuthService(
 
         codeRepository.save(code)
 
-        return Pair(code.code, authentication.redirectUri)
+        return CodeRedirect(code.code, authentication.state, authentication.redirectUri)
     }
 }

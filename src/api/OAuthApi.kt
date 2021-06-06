@@ -1,8 +1,9 @@
 package com.hungry.oauthsample.api
 
-import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
 import com.hungry.oauthsample.api.dto.ClientDto
 import com.hungry.oauthsample.api.dto.`in`.AuthenticationDto
+import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
+import com.hungry.oauthsample.api.dto.out.CodeRedirectDto
 import com.hungry.oauthsample.domain.oauth.OAuthService
 
 class OAuthApi(
@@ -20,7 +21,7 @@ class OAuthApi(
         service.updateRedirects(clientDto.toDomain())
     }
 
-    fun authenticate(authenticationDto: AuthenticationDto): Any {
-        return service.authenticateCode(authenticationDto.toDomain())
+    fun authenticate(authenticationDto: AuthenticationDto): CodeRedirectDto {
+        return CodeRedirectDto.fromDomain(service.authenticateCode(authenticationDto.toDomain()))
     }
 }
