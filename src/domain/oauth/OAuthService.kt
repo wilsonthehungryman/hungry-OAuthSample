@@ -6,12 +6,12 @@ import com.hungry.oauthsample.domain.Unauthorized
 import com.hungry.oauthsample.domain.users.UserRepository
 import com.hungry.oauthsample.domain.client.Client
 import com.hungry.oauthsample.domain.client.ClientRepository
-import java.util.UUID
 
 class OAuthService(
     private val passwordService: PasswordService,
     private val userRepository: UserRepository,
     private val clientRepository: ClientRepository,
+    private val codeRepository: CodeRepository,
 ) {
     fun createUser(createUser: CreateUser) {
         val hashedPassword = passwordService.hashPassword(createUser.password)
@@ -46,11 +46,10 @@ class OAuthService(
         if (!passwordService.isMatchingPassword(authentication.password, credential.hashedPassword))
             throw Unauthorized()
 
-        // TODO should be more complex
-        val code = UUID.randomUUID().toString()
+        val code = Code.generate(client.id)
 
-        // TODO save code with time
+        codeRepository.save(code)
 
-        return Pair(code, authentication.redirectUri)
+        return Pair(code.code, authentication.redirectUri)
     }
 }
