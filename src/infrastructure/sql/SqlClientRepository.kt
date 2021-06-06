@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
 internal object ClientTable: UUIDTable("clients", "client_id") {
@@ -23,8 +24,10 @@ internal object RedirectsTable: Table() {
 
 class SqlClientRepository: ClientRepository {
     init {
-        SchemaUtils.create(ClientTable)
-        SchemaUtils.create(RedirectsTable)
+        transaction {
+            SchemaUtils.create(ClientTable)
+            SchemaUtils.create(RedirectsTable)
+        }
     }
 
     override fun save(client: Client) {
