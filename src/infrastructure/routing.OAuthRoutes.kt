@@ -20,14 +20,7 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
     route("/oauth") {
         post ("/authentication") {
             val codeRedirect = oAuthApi.authenticate(call.receive<AuthenticationDto>())
-
-            call.respondRedirect(permanent = false) {
-                // TODO support others
-                protocol = URLProtocol.HTTPS
-                host = codeRedirect.uri
-                parameters.append("code", codeRedirect.code)
-                codeRedirect.state?.also { parameters.append("state", it) }
-            }
+            call.respondRedirect(codeRedirect.toUrl().buildString(), false)
         }
     }
 

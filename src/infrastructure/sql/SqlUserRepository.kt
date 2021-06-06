@@ -9,9 +9,11 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.UUID
 
-internal object UserTable: UUIDTable() {
+internal object UserTable: UUIDTable("users", "user_id") {
     val email: Column<String> = varchar("email", 200).uniqueIndex()
     val phoneNumber: Column<String> = varchar("phone_number", 100)
     val name: Column<String?> = varchar("name", 200).nullable()
@@ -40,6 +42,7 @@ class SqlUserRepository: UserRepository {
             }
 
             UserTable.insert {
+                it[id] = UUID.fromString(user.id)
                 it[email] = user.email
                 it[phoneNumber] = user.phoneNumber
                 it[name] = user.name
