@@ -1,0 +1,189 @@
+{
+  "info": {
+    "_postman_id": "d05188b0-ca67-4d0f-b154-8f4308f58303",
+    "name": "OAuthSample",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CreateUser",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"notsosecure\",\r\n    \"phoneNumber\": \"1231231234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateClient",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const resp = pm.response.json();\r",
+              "pm.environment.set('clientId', resp.id)\r",
+              "pm.collectionVariables.set('clientId', resp.id);\r",
+              "pm.environment.set('clientSecret', resp.secretKey)\r",
+              "pm.collectionVariables.set('clientSecret', resp.secretKey);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/client",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "client"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RegisterRedirect",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"{{clientId}}\",\r\n    \"secretKey\": \"{{clientSecret}}\",\r\n    \"redirectUris\": [\"http://localhost:8080\"]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/client/redirect",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "client",
+            "redirect"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "AuthenticateUserCode",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const getQueryParams = url => url.split('?')[1]\r",
+              "const getCodeParam = url => getQueryParams(url).split('&').filter(p => p.startsWith('code'))[0]\r",
+              "const getCode = url => getCodeParam(url).split('=')[1]\r",
+              "\r",
+              "if (pm.response.code === 302) {\r",
+              "    const redirectUrl = pm.response.headers.filter(h => h.key === 'Location')[0].value\r",
+              "    console.log(redirectUrl)\r",
+              "    const code = getCode(redirectUrl)\r",
+              "    pm.environment.set('code', code)\r",
+              "    pm.collectionVariables.set('code', code);\r",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"notsosecure\",\r\n    \"redirectUri\": \"http://localhost:8080/test\",\r\n    \"state\": \"1234\",\r\n    \"clientId\": \"{{clientId}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/oauth/authentication",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "oauth",
+            "authentication"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "AuthenticateCode",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"code\": \"a7966318-8498-4987-aff4-c2a5c4a650b8\",\r\n    \"clientId\": \"{{clientId}}\",\r\n    \"clientSecret\": \"{{clientSecret}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/oauth/exchange/code",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "oauth",
+            "exchange",
+            "code"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "code",
+      "value": ""
+    }
+  ]
+}
