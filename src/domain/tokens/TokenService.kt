@@ -65,6 +65,10 @@ class TokenService(
         return sign(token.toJwtBuilder())
     }
 
+    fun decodeToken(jwtString: String): Token {
+        return Token(JWT.decode(jwtString))
+    }
+
     fun validateToken(jwtString: String, audience: String, userId: String): Token {
         val verifier = JWT.require(keys.algorithm)
             .withIssuer(ISSUER)

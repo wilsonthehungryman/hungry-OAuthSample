@@ -32,4 +32,12 @@ class OAuthApi(
         val client = Client(codeExchangeDto.clientId, codeExchangeDto.clientSecret)
         return UserTokensDto.fromDomain(service.exchangeCode(codeExchangeDto.code, client))
     }
+
+    fun validateToken(token: String) {
+        service.validateToken(token)
+    }
+
+    fun refreshTokens(token: String): UserTokensDto {
+        return UserTokensDto.fromDomain(service.refreshTokens(token))
+    }
 }

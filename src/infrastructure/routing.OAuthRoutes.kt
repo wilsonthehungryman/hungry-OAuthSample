@@ -5,9 +5,9 @@ import com.hungry.oauthsample.api.dto.ClientDto
 import com.hungry.oauthsample.api.dto.`in`.AuthenticationDto
 import com.hungry.oauthsample.api.dto.`in`.CodeExchangeDto
 import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
+import com.hungry.oauthsample.api.dto.`in`.ValidateToken
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLProtocol
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
@@ -26,6 +26,15 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
 
         post ("/exchange/code") {
             call.respond(HttpStatusCode.OK, oAuthApi.exchangeCode(call.receive<CodeExchangeDto>()))
+        }
+
+        post ("/validate") {
+            oAuthApi.validateToken(call.receive<ValidateToken>().token)
+            call.respond(HttpStatusCode.NoContent)
+        }
+
+        post ("/refresh") {
+            call.respond(HttpStatusCode.OK, oAuthApi.refreshTokens(call.receive<ValidateToken>().token))
         }
     }
 

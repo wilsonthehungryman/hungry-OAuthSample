@@ -80,4 +80,25 @@ class OAuthService(
             refreshToken,
         )
     }
+
+    fun validateToken(token: String) {
+        val decoded = tokenService.decodeToken(token)
+        tokenService.validateToken(token, decoded.audience, decoded.subject)
+    }
+
+    fun refreshTokens(token: String): UserTokens {
+        val now = Instant.now()
+        val decoded = tokenService.decodeToken(token)
+
+        tokenService.validateToken(token, decoded.audience, decoded.subject)
+
+        val accessToken = tokenService.createAccessToken(decoded.subject, now, decoded.audience)
+        val refreshToken = tokenService.createRefreshToken(decoded.subject, now, decoded.audience)
+
+        return UserTokens(
+            decoded.subject,
+            accessToken,
+            refreshToken,
+        )
+    }
 }
