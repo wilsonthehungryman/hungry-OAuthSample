@@ -13,6 +13,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 class TokenService(
     private val tokenRepository: TokenRepository,
+    private val revokedTokenCache: RevokedTokenCache,
     private val keys: AppConfig.RSAKeyConfig
 ) {
     companion object {
@@ -81,8 +82,12 @@ class TokenService(
         tokenType?.also { verifier.withClaim(Token.TOKEN_TYPE, tokenType.toString()) }
 
         try {
-            val decoded = verifier.build().verify(jwtString)
-            return Token(decoded)
+            val decoded = Token(verifier.build().verify(jwtString))
+
+            if (revokedTokenCache.isRevokedToken(decoded.id))
+                throw Unauthorized()
+
+            return decoded
         } catch (e: JWTVerificationException) {
             throw Unauthorized()
         }
