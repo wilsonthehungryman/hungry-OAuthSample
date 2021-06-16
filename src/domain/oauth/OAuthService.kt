@@ -7,6 +7,7 @@ import com.hungry.oauthsample.domain.Unauthorized
 import com.hungry.oauthsample.domain.users.UserRepository
 import com.hungry.oauthsample.domain.client.Client
 import com.hungry.oauthsample.domain.client.ClientRepository
+import com.hungry.oauthsample.domain.tokens.Token
 import com.hungry.oauthsample.domain.tokens.TokenService
 import java.time.Instant
 
@@ -81,9 +82,10 @@ class OAuthService(
         )
     }
 
-    fun validateToken(token: String) {
+    fun validateToken(token: String): Token {
         val decoded = tokenService.decodeToken(token)
         tokenService.validateToken(token, decoded.audience, decoded.subject)
+        return decoded
     }
 
     fun refreshTokens(token: String): UserTokens {

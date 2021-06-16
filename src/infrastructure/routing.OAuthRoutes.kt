@@ -6,6 +6,9 @@ import com.hungry.oauthsample.api.dto.`in`.AuthenticationDto
 import com.hungry.oauthsample.api.dto.`in`.CodeExchangeDto
 import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
 import com.hungry.oauthsample.api.dto.`in`.ValidateToken
+import com.hungry.oauthsample.domain.Unauthorized
+import com.hungry.oauthsample.domain.tokens.Token
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
@@ -18,6 +21,11 @@ import io.ktor.routing.put
 import io.ktor.routing.route
 
 fun Route.oauthRoutes(oAuthApi: OAuthApi) {
+    fun isAuthenticated(call: ApplicationCall): Token {
+        val rawToken = call.request.headers["Authorization"]?.replace("Bearer", "")?.trim() ?: throw Unauthorized()
+        return oAuthApi.validateToken(rawToken)
+    }
+
     route("/oauth") {
         post ("/authentication") {
             val codeRedirect = oAuthApi.authenticate(call.receive<AuthenticationDto>())
@@ -26,6 +34,10 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
 
         post ("/exchange/code") {
             call.respond(HttpStatusCode.OK, oAuthApi.exchangeCode(call.receive<CodeExchangeDto>()))
+        }
+
+        get("/validate") {
+            isAuthenticated(call)
         }
 
         post ("/validate") {
