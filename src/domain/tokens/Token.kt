@@ -3,6 +3,7 @@ package com.hungry.oauthsample.domain.tokens
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTCreator.Builder
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.hungry.oauthsample.domain.Unauthorized
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -34,6 +35,7 @@ class Token (
     val issuer: String,
     val audience: String,
     val subject: String,
+    val type: TokenType,
     val issuedAt: Instant,
     val expiresAt: Instant,
     val id: String = UUID.randomUUID().toString(),
@@ -43,17 +45,25 @@ class Token (
         jwt.issuer,
         jwt.audience.first(),
         jwt.subject,
+        TokenType.valueOf(jwt.claims[TOKEN_TYPE]?.asString() ?: throw Unauthorized()),
         jwt.issuedAt.toInstant(),
         jwt.expiresAt.toInstant(),
         jwt.id,
         jwt.claims,
     )
 
+    companion object {
+        const val TOKEN_TYPE = "tokenType"
+    }
+
     fun isExpired(now: Instant): Boolean {
         return expiresAt < now
     }
 
     fun toJwtBuilder(): Builder {
+        val claimsToAdd = claims.toMutableMap()
+        claimsToAdd[TOKEN_TYPE] = type
+
         return JWT.create()
             .withJWTId(id)
             .withIssuedAt(Date.from(issuedAt))
@@ -62,6 +72,6 @@ class Token (
             .withAudience(audience)
             .withExpiresAt(Date.from(expiresAt))
             .withNotBefore(Date.from(issuedAt))
-            .withClaims(claims)
+            .withClaims(claimsToAdd)
     }
 }

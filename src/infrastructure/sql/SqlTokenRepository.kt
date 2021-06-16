@@ -3,6 +3,7 @@ package com.hungry.oauthsample.infrastructure.sql
 import com.hungry.oauthsample.domain.tokens.Token
 import com.hungry.oauthsample.domain.tokens.TokenRepository
 import com.hungry.oauthsample.domain.tokens.TokenService.Companion.ISSUER
+import com.hungry.oauthsample.domain.tokens.TokenType
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ResultRow
@@ -18,6 +19,7 @@ internal object TokenTable: UUIDTable("tokens", "token_id") {
     val audience: Column<String> = varchar("audience", 200)
     val subject: Column<String> = varchar("subject", 200)
     val issuedAt: Column<Long> = long("issued_at")
+    val type: Column<String> = varchar("type", 20)
     val expiresAt: Column<Long> = long("expires_at")
 }
 
@@ -34,6 +36,7 @@ class SqlTokenRepository: TokenRepository {
                 it[id] = UUID.fromString(token.id)
                 it[audience] = token.audience
                 it[subject] = token.subject
+                it[type] = token.type.toString()
                 it[issuedAt] = token.issuedAt.toEpochMilli()
                 it[expiresAt] = token.expiresAt.toEpochMilli()
             }
@@ -89,6 +92,7 @@ class SqlTokenRepository: TokenRepository {
             ISSUER,
             row[TokenTable.audience],
             row[TokenTable.subject],
+            TokenType.valueOf(row[TokenTable.type]),
             Instant.ofEpochMilli(row[TokenTable.issuedAt]),
             Instant.ofEpochMilli(row[TokenTable.expiresAt]),
             row[TokenTable.id].toString()

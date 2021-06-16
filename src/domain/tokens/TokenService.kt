@@ -31,6 +31,7 @@ class TokenService(
             ISSUER,
             audience,
             userId,
+            TokenType.ACCESS,
             now,
             now.plusSeconds(ACCESS_TOKEN_EXPIRY_SECONDS),
         )
@@ -45,6 +46,7 @@ class TokenService(
             ISSUER,
             audience,
             userId,
+            TokenType.REFRESH,
             now,
             now.plusSeconds(REFRESH_TOKEN_EXPIRY_SECONDS),
         )
@@ -57,6 +59,7 @@ class TokenService(
             ISSUER,
             audience,
             userId,
+            TokenType.ID,
             now,
             now.plusSeconds(ID_TOKEN_EXPIRY_SECONDS),
             claims = claims,
@@ -69,15 +72,16 @@ class TokenService(
         return Token(JWT.decode(jwtString))
     }
 
-    fun validateToken(jwtString: String, audience: String, userId: String): Token {
+    fun validateToken(jwtString: String, audience: String, userId: String, tokenType: TokenType?): Token {
         val verifier = JWT.require(keys.algorithm)
             .withIssuer(ISSUER)
             .withAudience(audience)
             .withSubject(userId)
-            .build()
+
+        tokenType?.also { verifier.withClaim(Token.TOKEN_TYPE, tokenType.toString()) }
 
         try {
-            val decoded = verifier.verify(jwtString)
+            val decoded = verifier.build().verify(jwtString)
             return Token(decoded)
         } catch (e: JWTVerificationException) {
             throw Unauthorized()

@@ -9,6 +9,7 @@ import com.hungry.oauthsample.api.dto.out.UserTokensDto
 import com.hungry.oauthsample.domain.client.Client
 import com.hungry.oauthsample.domain.oauth.OAuthService
 import com.hungry.oauthsample.domain.tokens.Token
+import com.hungry.oauthsample.domain.tokens.TokenType
 
 class OAuthApi(
     private val service: OAuthService,
@@ -34,8 +35,8 @@ class OAuthApi(
         return UserTokensDto.fromDomain(service.exchangeCode(codeExchangeDto.code, client))
     }
 
-    fun validateToken(token: String): Token {
-        return service.validateToken(token)
+    fun validateToken(token: String, tokenType: TokenType? = null): Token {
+        return service.validateToken(token, tokenType)
     }
 
     fun refreshTokens(token: String): UserTokensDto {

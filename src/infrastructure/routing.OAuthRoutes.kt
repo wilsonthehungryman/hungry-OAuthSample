@@ -8,6 +8,7 @@ import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
 import com.hungry.oauthsample.api.dto.`in`.ValidateToken
 import com.hungry.oauthsample.domain.Unauthorized
 import com.hungry.oauthsample.domain.tokens.Token
+import com.hungry.oauthsample.domain.tokens.TokenType
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -21,9 +22,9 @@ import io.ktor.routing.put
 import io.ktor.routing.route
 
 fun Route.oauthRoutes(oAuthApi: OAuthApi) {
-    fun isAuthenticated(call: ApplicationCall): Token {
+    fun isAuthenticated(call: ApplicationCall, tokenType: TokenType? = null): Token {
         val rawToken = call.request.headers["Authorization"]?.replace("Bearer", "")?.trim() ?: throw Unauthorized()
-        return oAuthApi.validateToken(rawToken)
+        return oAuthApi.validateToken(rawToken, tokenType)
     }
 
     route("/oauth") {

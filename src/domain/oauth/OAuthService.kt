@@ -9,6 +9,7 @@ import com.hungry.oauthsample.domain.client.Client
 import com.hungry.oauthsample.domain.client.ClientRepository
 import com.hungry.oauthsample.domain.tokens.Token
 import com.hungry.oauthsample.domain.tokens.TokenService
+import com.hungry.oauthsample.domain.tokens.TokenType
 import java.time.Instant
 
 class OAuthService(
@@ -82,9 +83,9 @@ class OAuthService(
         )
     }
 
-    fun validateToken(token: String): Token {
+    fun validateToken(token: String, tokenType: TokenType?): Token {
         val decoded = tokenService.decodeToken(token)
-        tokenService.validateToken(token, decoded.audience, decoded.subject)
+        tokenService.validateToken(token, decoded.audience, decoded.subject, tokenType)
         return decoded
     }
 
@@ -92,7 +93,7 @@ class OAuthService(
         val now = Instant.now()
         val decoded = tokenService.decodeToken(token)
 
-        tokenService.validateToken(token, decoded.audience, decoded.subject)
+        tokenService.validateToken(token, decoded.audience, decoded.subject, TokenType.REFRESH)
 
         val accessToken = tokenService.createAccessToken(decoded.subject, now, decoded.audience)
         val refreshToken = tokenService.createRefreshToken(decoded.subject, now, decoded.audience)
