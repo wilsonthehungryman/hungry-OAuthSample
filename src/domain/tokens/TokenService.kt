@@ -108,10 +108,14 @@ class TokenService(
     }
 
     fun logoutEverywhere(userId: String) {
+        val tokens = tokenRepository.findByUserId(userId)
+        revokedTokenCache.addRevokedTokens(tokens)
         tokenRepository.deleteByUserId(userId)
     }
 
     fun logoutDevice(deviceId: String) {
+        val tokens = tokenRepository.findByDeviceId(deviceId)
+        revokedTokenCache.addRevokedTokens(tokens)
         tokenRepository.deleteByDeviceId(deviceId)
     }
 }

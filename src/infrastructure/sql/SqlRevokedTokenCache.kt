@@ -1,9 +1,11 @@
 package com.hungry.oauthsample.infrastructure.sql
 
 import com.hungry.oauthsample.domain.tokens.RevokedTokenCache
+import com.hungry.oauthsample.domain.tokens.Token
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -28,6 +30,15 @@ class SqlRevokedTokenCache: RevokedTokenCache {
             TokenCacheTable.insert {
                 it[this.id] = UUID.fromString(id)
                 it[expiresAt] = expiration.toEpochMilli()
+            }
+        }
+    }
+
+    override fun addRevokedTokens(tokens: Set<Token>) {
+        transaction {
+            TokenCacheTable.batchInsert(tokens) { token ->
+                this[TokenCacheTable.id] = UUID.fromString(token.id)
+                this[TokenCacheTable.expiresAt] = token.expiresAt.toEpochMilli()
             }
         }
     }
