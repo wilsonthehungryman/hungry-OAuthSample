@@ -7,5 +7,6 @@ class Authentication(
     val redirectUri: String,
     val state: String?,
     val scope: String?,
+    val deviceId: String?,
 ) {
 }

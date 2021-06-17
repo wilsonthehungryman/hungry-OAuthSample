@@ -17,10 +17,11 @@ import java.util.UUID
 
 internal object TokenTable: UUIDTable("tokens", "token_id") {
     val audience: Column<String> = varchar("audience", 200)
-    val subject: Column<String> = varchar("subject", 200)
+    val subject: Column<String> = varchar("subject", 200).index()
     val issuedAt: Column<Long> = long("issued_at")
+    val deviceId: Column<String?> = varchar("device_id", 200).index().nullable()
     val type: Column<String> = varchar("type", 20)
-    val expiresAt: Column<Long> = long("expires_at")
+    val expiresAt: Column<Long> = long("expires_at").index()
 }
 
 class SqlTokenRepository: TokenRepository {
@@ -36,6 +37,7 @@ class SqlTokenRepository: TokenRepository {
                 it[id] = UUID.fromString(token.id)
                 it[audience] = token.audience
                 it[subject] = token.subject
+                it[deviceId] = token.deviceId
                 it[type] = token.type.toString()
                 it[issuedAt] = token.issuedAt.toEpochMilli()
                 it[expiresAt] = token.expiresAt.toEpochMilli()
@@ -63,6 +65,16 @@ class SqlTokenRepository: TokenRepository {
         }
     }
 
+    override fun findByDeviceId(deviceId: String): Set<Token> {
+        return transaction {
+            TokenTable.select {
+                TokenTable.deviceId eq deviceId
+            }.map {
+                deserialize(it)
+            }.toSet()
+        }
+    }
+
     override fun deleteById(id: String) {
         transaction {
             TokenTable.deleteWhere {
@@ -75,6 +87,14 @@ class SqlTokenRepository: TokenRepository {
         transaction {
             TokenTable.deleteWhere {
                 TokenTable.subject eq userId
+            }
+        }
+    }
+
+    override fun deleteByDeviceId(deviceId: String) {
+        transaction {
+            TokenTable.deleteWhere {
+                TokenTable.deviceId eq deviceId
             }
         }
     }
@@ -95,7 +115,8 @@ class SqlTokenRepository: TokenRepository {
             TokenType.valueOf(row[TokenTable.type]),
             Instant.ofEpochMilli(row[TokenTable.issuedAt]),
             Instant.ofEpochMilli(row[TokenTable.expiresAt]),
-            row[TokenTable.id].toString()
+            row[TokenTable.deviceId],
+            row[TokenTable.id].toString(),
         )
     }
 }

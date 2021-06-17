@@ -27,6 +27,10 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
         return oAuthApi.validateToken(rawToken, tokenType)
     }
 
+    fun deviceId(call: ApplicationCall): String? {
+        return call.request.headers["Device-Id"]
+    }
+
     route("/oauth") {
         post ("/authentication") {
             val codeRedirect = oAuthApi.authenticate(call.receive<AuthenticationDto>())

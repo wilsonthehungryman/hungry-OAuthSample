@@ -27,7 +27,7 @@ class TokenService(
         return builder.sign(keys.algorithm)
     }
 
-    fun createAccessToken(userId: String, now: Instant, audience: String): String {
+    fun createAccessToken(userId: String, now: Instant, audience: String, deviceId: String): String {
         val token = Token(
             ISSUER,
             audience,
@@ -35,6 +35,7 @@ class TokenService(
             TokenType.ACCESS,
             now,
             now.plusSeconds(ACCESS_TOKEN_EXPIRY_SECONDS),
+            deviceId,
         )
 
         tokenRepository.save(token)
@@ -42,7 +43,7 @@ class TokenService(
         return sign(token.toJwtBuilder())
     }
 
-    fun createRefreshToken(userId: String, now: Instant, audience: String): String {
+    fun createRefreshToken(userId: String, now: Instant, audience: String, deviceId: String): String {
         val token = Token(
             ISSUER,
             audience,
@@ -50,7 +51,10 @@ class TokenService(
             TokenType.REFRESH,
             now,
             now.plusSeconds(REFRESH_TOKEN_EXPIRY_SECONDS),
+            deviceId,
         )
+
+        tokenRepository.save(token)
 
         return sign(token.toJwtBuilder())
     }
@@ -65,6 +69,8 @@ class TokenService(
             now.plusSeconds(ID_TOKEN_EXPIRY_SECONDS),
             claims = claims,
         )
+
+        tokenRepository.save(token)
 
         return sign(token.toJwtBuilder())
     }

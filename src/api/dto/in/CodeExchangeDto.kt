@@ -4,5 +4,6 @@ data class CodeExchangeDto(
     val code: String,
     val clientId: String,
     val clientSecret: String,
+    val deviceId: String,
     ) {
 }

@@ -32,7 +32,7 @@ class OAuthApi(
 
     fun exchangeCode(codeExchangeDto: CodeExchangeDto): UserTokensDto {
         val client = Client(codeExchangeDto.clientId, codeExchangeDto.clientSecret)
-        return UserTokensDto.fromDomain(service.exchangeCode(codeExchangeDto.code, client))
+        return UserTokensDto.fromDomain(service.exchangeCode(codeExchangeDto.code, client, codeExchangeDto.deviceId))
     }
 
     fun validateToken(token: String, tokenType: TokenType? = null): Token {

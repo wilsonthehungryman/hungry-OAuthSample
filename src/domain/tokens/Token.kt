@@ -39,6 +39,7 @@ class Token (
     val type: TokenType,
     val issuedAt: Instant,
     val expiresAt: Instant,
+    val deviceId: String? = null,
     val id: String = UUID.randomUUID().toString(),
     val claims: Map<String, Any> = emptyMap(),
 ) {
@@ -49,12 +50,14 @@ class Token (
         TokenType.valueOf(jwt.claims[TOKEN_TYPE]?.asString() ?: throw Unauthorized()),
         jwt.issuedAt.toInstant(),
         jwt.expiresAt.toInstant(),
+        jwt.claims[DEVICE_ID]?.asString(),
         jwt.id,
         jwt.claims,
     )
 
     companion object {
         const val TOKEN_TYPE = "tokenType"
+        const val DEVICE_ID = "deviceId"
     }
 
     fun isExpired(now: Instant): Boolean {
@@ -64,6 +67,7 @@ class Token (
     fun toJwtBuilder(): Builder {
         val claimsToAdd = claims.toMutableMap()
         claimsToAdd[TOKEN_TYPE] = type
+        deviceId?.also { claimsToAdd[DEVICE_ID] = it }
 
         return JWT.create()
             .withJWTId(id)

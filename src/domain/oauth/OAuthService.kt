@@ -11,6 +11,7 @@ import com.hungry.oauthsample.domain.tokens.Token
 import com.hungry.oauthsample.domain.tokens.TokenService
 import com.hungry.oauthsample.domain.tokens.TokenType
 import java.time.Instant
+import java.util.UUID
 
 class OAuthService(
     private val passwordService: PasswordService,
@@ -56,10 +57,15 @@ class OAuthService(
 
         codeRepository.save(code)
 
-        return CodeRedirect(code.code, authentication.state, authentication.redirectUri)
+        return CodeRedirect(
+            code.code,
+            authentication.state,
+            authentication.redirectUri,
+            authentication.deviceId ?: UUID.randomUUID().toString(),
+        )
     }
 
-    fun exchangeCode(code: String, client: Client): UserTokens {
+    fun exchangeCode(code: String, client: Client, deviceId: String): UserTokens {
         val now = Instant.now()
         val foundCode = codeRepository.findByCode(code) ?: throw Unauthorized()
 
@@ -73,11 +79,12 @@ class OAuthService(
         if (foundClient.secretKey != client.secretKey || foundClient.id != client.id)
             throw Unauthorized()
 
-        val accessToken = tokenService.createAccessToken(foundCode.userId, now, client.id)
-        val refreshToken = tokenService.createRefreshToken(foundCode.userId, now, client.id)
+        val accessToken = tokenService.createAccessToken(foundCode.userId, now, client.id, deviceId)
+        val refreshToken = tokenService.createRefreshToken(foundCode.userId, now, client.id, deviceId)
 
         return UserTokens(
             foundCode.userId,
+            deviceId,
             accessToken,
             refreshToken,
         )
@@ -93,10 +100,12 @@ class OAuthService(
         val now = Instant.now()
         val decoded = tokenService.decodeToken(token)
 
+        val deviceId = decoded.deviceId ?: throw IllegalStateException()
+
         tokenService.validateToken(token, decoded.audience, decoded.subject, TokenType.REFRESH)
 
-        val accessToken = tokenService.createAccessToken(decoded.subject, now, decoded.audience)
-        val refreshToken = tokenService.createRefreshToken(decoded.subject, now, decoded.audience)
+        val accessToken = tokenService.createAccessToken(decoded.subject, now, decoded.audience, deviceId)
+        val refreshToken = tokenService.createRefreshToken(decoded.subject, now, decoded.audience, deviceId)
 
         return UserTokens(
             decoded.subject,

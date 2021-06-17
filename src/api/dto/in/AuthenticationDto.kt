@@ -8,7 +8,8 @@ data class AuthenticationDto(
     val clientId: String,
     val redirectUri: String,
     val state: String?,
-    val scope: String? // TODO, though not really needed atm, just for openid
+    val scope: String?, // TODO, though not really needed atm, just for openid
+    val deviceId: String?,
 ) {
     fun toDomain(): Authentication {
         return Authentication(
@@ -18,6 +19,7 @@ data class AuthenticationDto(
             redirectUri,
             state,
             scope,
+            deviceId,
         )
     }
 }
