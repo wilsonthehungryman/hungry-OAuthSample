@@ -85,7 +85,7 @@ class OAuthService(
 
     fun validateToken(token: String, tokenType: TokenType?): Token {
         val decoded = tokenService.decodeToken(token)
-        tokenService.validateToken(token, decoded.audience, decoded.subject, tokenType)
+        tokenService.validateToken(token, decoded.audience, decoded.subject, tokenType, activeCheck = true)
         return decoded
     }
 

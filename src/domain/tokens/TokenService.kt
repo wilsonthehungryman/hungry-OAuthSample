@@ -73,7 +73,7 @@ class TokenService(
         return Token(JWT.decode(jwtString))
     }
 
-    fun validateToken(jwtString: String, audience: String, userId: String, tokenType: TokenType?): Token {
+    fun validateToken(jwtString: String, audience: String, userId: String, tokenType: TokenType?, activeCheck: Boolean = false): Token {
         val verifier = JWT.require(keys.algorithm)
             .withIssuer(ISSUER)
             .withAudience(audience)
@@ -87,9 +87,16 @@ class TokenService(
             if (revokedTokenCache.isRevokedToken(decoded.id))
                 throw Unauthorized()
 
+            if (activeCheck || tokenType == TokenType.REFRESH)
+                tokenActiveCheck(decoded)
+
             return decoded
         } catch (e: JWTVerificationException) {
             throw Unauthorized()
         }
+    }
+
+    fun tokenActiveCheck(token: Token) {
+        tokenRepository.findById(token.id) ?: throw Unauthorized()
     }
 }
