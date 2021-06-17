@@ -100,7 +100,7 @@ class OAuthService(
         val now = Instant.now()
         val decoded = tokenService.decodeToken(token)
 
-        val deviceId = decoded.deviceId ?: throw IllegalStateException()
+        val deviceId = decoded.deviceId
 
         tokenService.validateToken(token, decoded.audience, decoded.subject, TokenType.REFRESH)
 
@@ -112,5 +112,12 @@ class OAuthService(
             accessToken,
             refreshToken,
         )
+    }
+
+    fun logout(logout: Logout) {
+        if (logout.logoutEverywhere)
+            tokenService.logoutEverywhere(logout.userId)
+        else
+            tokenService.logoutDevice(logout.deviceId)
     }
 }

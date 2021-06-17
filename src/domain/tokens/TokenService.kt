@@ -59,7 +59,7 @@ class TokenService(
         return sign(token.toJwtBuilder())
     }
 
-    fun createIdToken(userId: String, now: Instant, audience: String, claims: Map<String, Any>): String {
+    fun createIdToken(userId: String, now: Instant, audience: String, deviceId: String, claims: Map<String, Any>): String {
         val token = Token(
             ISSUER,
             audience,
@@ -67,6 +67,7 @@ class TokenService(
             TokenType.ID,
             now,
             now.plusSeconds(ID_TOKEN_EXPIRY_SECONDS),
+            deviceId,
             claims = claims,
         )
 
@@ -102,7 +103,15 @@ class TokenService(
         }
     }
 
-    fun tokenActiveCheck(token: Token) {
+    private fun tokenActiveCheck(token: Token) {
         tokenRepository.findById(token.id) ?: throw Unauthorized()
+    }
+
+    fun logoutEverywhere(userId: String) {
+        tokenRepository.deleteByUserId(userId)
+    }
+
+    fun logoutDevice(deviceId: String) {
+        tokenRepository.deleteByDeviceId(deviceId)
     }
 }

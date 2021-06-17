@@ -4,6 +4,7 @@ import com.hungry.oauthsample.api.dto.ClientDto
 import com.hungry.oauthsample.api.dto.`in`.AuthenticationDto
 import com.hungry.oauthsample.api.dto.`in`.CodeExchangeDto
 import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
+import com.hungry.oauthsample.api.dto.`in`.LogoutDto
 import com.hungry.oauthsample.api.dto.out.CodeRedirectDto
 import com.hungry.oauthsample.api.dto.out.UserTokensDto
 import com.hungry.oauthsample.domain.client.Client
@@ -41,5 +42,9 @@ class OAuthApi(
 
     fun refreshTokens(token: String): UserTokensDto {
         return UserTokensDto.fromDomain(service.refreshTokens(token))
+    }
+
+    fun logout(logoutDto: LogoutDto, token: Token) {
+        service.logout(logoutDto.toDomain(token))
     }
 }

@@ -39,7 +39,7 @@ class Token (
     val type: TokenType,
     val issuedAt: Instant,
     val expiresAt: Instant,
-    val deviceId: String? = null,
+    val deviceId: String,
     val id: String = UUID.randomUUID().toString(),
     val claims: Map<String, Any> = emptyMap(),
 ) {
@@ -50,7 +50,7 @@ class Token (
         TokenType.valueOf(jwt.claims[TOKEN_TYPE]?.asString() ?: throw Unauthorized()),
         jwt.issuedAt.toInstant(),
         jwt.expiresAt.toInstant(),
-        jwt.claims[DEVICE_ID]?.asString(),
+        jwt.claims[DEVICE_ID]?.asString() ?: throw Unauthorized(),
         jwt.id,
         jwt.claims,
     )

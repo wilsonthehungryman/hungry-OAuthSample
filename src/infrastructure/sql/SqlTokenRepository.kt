@@ -19,7 +19,7 @@ internal object TokenTable: UUIDTable("tokens", "token_id") {
     val audience: Column<String> = varchar("audience", 200)
     val subject: Column<String> = varchar("subject", 200).index()
     val issuedAt: Column<Long> = long("issued_at")
-    val deviceId: Column<String?> = varchar("device_id", 200).index().nullable()
+    val deviceId: Column<String> = varchar("device_id", 200).index()
     val type: Column<String> = varchar("type", 20)
     val expiresAt: Column<Long> = long("expires_at").index()
 }

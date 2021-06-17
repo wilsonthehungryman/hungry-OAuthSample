@@ -5,6 +5,7 @@ import com.hungry.oauthsample.api.dto.ClientDto
 import com.hungry.oauthsample.api.dto.`in`.AuthenticationDto
 import com.hungry.oauthsample.api.dto.`in`.CodeExchangeDto
 import com.hungry.oauthsample.api.dto.`in`.CreateUserDto
+import com.hungry.oauthsample.api.dto.`in`.LogoutDto
 import com.hungry.oauthsample.api.dto.`in`.ValidateToken
 import com.hungry.oauthsample.domain.Unauthorized
 import com.hungry.oauthsample.domain.tokens.Token
@@ -51,6 +52,11 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
                 oAuthApi.validateToken(call.receive<ValidateToken>().token)
                 call.respond(HttpStatusCode.NoContent)
             }
+        }
+
+        post ("/logout") {
+            val token = isAuthenticated(call, TokenType.ACCESS)
+            oAuthApi.logout(call.receive<LogoutDto>(), token)
         }
 
         post ("/refresh") {
