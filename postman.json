@@ -127,7 +127,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"notsosecure\",\r\n    \"redirectUri\": \"http://localhost:8080/test\",\r\n    \"state\": \"1234\",\r\n    \"clientId\": \"{{clientId}}\"\r\n}",
+          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"notsosecure\",\r\n    \"redirectUri\": \"http://localhost:8080\",\r\n    \"state\": \"1234\",\r\n    \"clientId\": \"{{clientId}}\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -151,12 +151,27 @@
     },
     {
       "name": "AuthenticateCode",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const resp = pm.response.json();\r",
+              "pm.environment.set('accessToken', resp.accessToken)\r",
+              "pm.collectionVariables.set('accessToken', resp.accessToken);\r",
+              "pm.environment.set('refreshToken', resp.refreshToken)\r",
+              "pm.collectionVariables.set('refreshToken', resp.refreshToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"code\": \"a7966318-8498-4987-aff4-c2a5c4a650b8\",\r\n    \"clientId\": \"{{clientId}}\",\r\n    \"clientSecret\": \"{{clientSecret}}\"\r\n}",
+          "raw": "{\r\n    \"code\": \"{{code}}\",\r\n    \"clientId\": \"{{clientId}}\",\r\n    \"clientSecret\": \"{{clientSecret}}\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -178,11 +193,126 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "ValidateTokenPost",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"token\": \"{{accessToken}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/oauth/validate",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "oauth",
+            "validate"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ValidateTokenGetHeader",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/oauth/validate",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "oauth",
+            "validate"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RefreshTokens",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const resp = pm.response.json();\r",
+              "pm.environment.set('accessToken', resp.accessToken)\r",
+              "pm.collectionVariables.set('accessToken', resp.accessToken);\r",
+              "pm.environment.set('refreshToken', resp.refreshToken)\r",
+              "pm.collectionVariables.set('refreshToken', resp.refreshToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"token\": \"{{refreshToken}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/oauth/refresh",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "oauth",
+            "refresh"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
     {
       "key": "code",
+      "value": ""
+    },
+    {
+      "key": "clientId",
+      "value": ""
+    },
+    {
+      "key": "clientSecret",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
       "value": ""
     }
   ]
