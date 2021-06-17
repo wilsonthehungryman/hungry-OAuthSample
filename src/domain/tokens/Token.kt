@@ -24,6 +24,7 @@ fun Builder.withClaims(claims: Map<String, Any>): Builder {
             is Double -> this.withClaim(it.key, value)
             is Long -> this.withClaim(it.key, value)
             is List<*> -> this.withClaim(it.key, value)
+            is Enum<*> -> this.withClaim(it.key, value.toString())
             // TODO arrays and map, not needed for my use case
 //            is Map<*, *> -> this.withClaim(it.key, value as Map<String, *>)
         }

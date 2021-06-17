@@ -37,13 +37,16 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
             call.respond(HttpStatusCode.OK, oAuthApi.exchangeCode(call.receive<CodeExchangeDto>()))
         }
 
-        get("/validate") {
-            isAuthenticated(call)
-        }
+        route("/validate") {
+            get {
+                isAuthenticated(call)
+                call.respond(HttpStatusCode.NoContent)
+            }
 
-        post ("/validate") {
-            oAuthApi.validateToken(call.receive<ValidateToken>().token)
-            call.respond(HttpStatusCode.NoContent)
+            post {
+                oAuthApi.validateToken(call.receive<ValidateToken>().token)
+                call.respond(HttpStatusCode.NoContent)
+            }
         }
 
         post ("/refresh") {
