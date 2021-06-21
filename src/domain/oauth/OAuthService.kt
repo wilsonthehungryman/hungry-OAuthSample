@@ -109,6 +109,7 @@ class OAuthService(
 
         return UserTokens(
             decoded.subject,
+            deviceId,
             accessToken,
             refreshToken,
         )

@@ -57,6 +57,7 @@ fun Route.oauthRoutes(oAuthApi: OAuthApi) {
         post ("/logout") {
             val token = isAuthenticated(call, TokenType.ACCESS)
             oAuthApi.logout(call.receive<LogoutDto>(), token)
+            call.respond(HttpStatusCode.NoContent)
         }
 
         post ("/refresh") {
