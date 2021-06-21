@@ -105,14 +105,19 @@
             "exec": [
               "const getQueryParams = url => url.split('?')[1]\r",
               "const getCodeParam = url => getQueryParams(url).split('&').filter(p => p.startsWith('code'))[0]\r",
+              "const getDeviceIdParam =  url => getQueryParams(url).split('&').filter(p => p.startsWith('deviceId'))[0]\r",
               "const getCode = url => getCodeParam(url).split('=')[1]\r",
+              "const getDeviceId = url => getDeviceIdParam(url).split('=')[1]\r",
               "\r",
               "if (pm.response.code === 302) {\r",
               "    const redirectUrl = pm.response.headers.filter(h => h.key === 'Location')[0].value\r",
               "    console.log(redirectUrl)\r",
               "    const code = getCode(redirectUrl)\r",
+              "    const deviceId = getDeviceId(redirectUrl)\r",
               "    pm.environment.set('code', code)\r",
               "    pm.collectionVariables.set('code', code);\r",
+              "    pm.environment.set('deviceId', deviceId)\r",
+              "    pm.collectionVariables.set('deviceId', deviceId)\r",
               "}"
             ],
             "type": "text/javascript"
@@ -171,7 +176,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"code\": \"{{code}}\",\r\n    \"clientId\": \"{{clientId}}\",\r\n    \"clientSecret\": \"{{clientSecret}}\"\r\n}",
+          "raw": "{\r\n    \"code\": \"{{code}}\",\r\n    \"clientId\": \"{{clientId}}\",\r\n    \"clientSecret\": \"{{clientSecret}}\",\r\n    \"deviceId\": \"{{deviceId}}\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -292,6 +297,41 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"logoutEverywhere\": false\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/oauth/logout",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "oauth",
+            "logout"
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
@@ -313,6 +353,10 @@
     },
     {
       "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "deviceId",
       "value": ""
     }
   ]
